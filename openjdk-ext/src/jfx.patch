@@ -1,6 +1,6 @@
 diff --git a/README_OpenJFX.md b/README_OpenJFX.md
 new file mode 100644
-index 00000000000..412f2115e37
+index 00000000000..1c1df60e150
 --- /dev/null
 +++ b/README_OpenJFX.md
 @@ -0,0 +1,12 @@
@@ -334,10 +334,10 @@ index 00000000000..82fcc6967bf
 +JAVAC_FLAGS += -encoding UTF-8
 diff --git a/make/modules/javafx.graphics/Gensrc.gmk b/make/modules/javafx.graphics/Gensrc.gmk
 new file mode 100644
-index 00000000000..9056e163279
+index 00000000000..3eea285217f
 --- /dev/null
 +++ b/make/modules/javafx.graphics/Gensrc.gmk
-@@ -0,0 +1,331 @@
+@@ -0,0 +1,334 @@
 +include GensrcCommon.gmk
 +include Execute.gmk
 +
@@ -383,7 +383,8 @@ index 00000000000..9056e163279
 +    SRC := $(OPENJFX_MODULES_SRC)/modules/javafx.base/src/main/java, \
 +    EXTRA_FILES := $(BASE_VERSION_INFO_GENSRC), \
 +    BIN := $(BASE_CORE_TEMP_DIR), \
-+    DISABLED_WARNINGS := rawtypes unchecked deprecation removal preview missing-explicit-ctor serial overloads module this-escape, \
++    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
++    DISABLED_WARNINGS := rawtypes unchecked deprecation removal preview missing-explicit-ctor serial overloads module this-escape options, \
 +    DEPENDS := $(BASE_VERSION_INFO_GENSRC), \
 +))
 +
@@ -392,8 +393,8 @@ index 00000000000..9056e163279
 +    SMALL_JAVA := false, \
 +    SRC := $(GRAPHICS_MODULE_SRC)/src/main/java, \
 +    BIN := $(GRAPHICS_CORE_TEMP_DIR), \
-+    JAVAC_FLAGS := --module-path $(BASE_CORE_TEMP_DIR) --add-modules=javafx.base, \
-+    DISABLED_WARNINGS := rawtypes unchecked deprecation removal preview missing-explicit-ctor serial overloads module this-escape lossy-conversions auxiliaryclass dangling-doc-comments static restricted exports fallthrough, \
++    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION) --module-path $(BASE_CORE_TEMP_DIR) --add-modules=javafx.base, \
++    DISABLED_WARNINGS := rawtypes unchecked deprecation removal preview missing-explicit-ctor serial overloads module this-escape lossy-conversions auxiliaryclass dangling-doc-comments static restricted exports fallthrough options, \
 +    DEPENDS := $(BUILD_BASE_CORE_TEMP), \
 +))
 +
@@ -459,7 +460,8 @@ index 00000000000..9056e163279
 +    EXTRA_FILES := $(ANTLR_GENERATED_FILES), \
 +    BIN := $(JSLC_CLASSES_DIR), \
 +    CLASSPATH := $(ANTLR_JAR), \
-+    DISABLED_WARNINGS := rawtypes unchecked deprecation removal this-escape, \
++    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
++    DISABLED_WARNINGS := rawtypes unchecked deprecation removal this-escape options, \
 +))
 +
 +$(JSLC_CLASSES_DIR)/_the.BUILD_JSLC_COMPILER_batch: $(ANTLR_GENERATED_FILES)
@@ -476,7 +478,8 @@ index 00000000000..9056e163279
 +    SRC := $(DECORA_COMPILER_SRC_DIR), \
 +    BIN := $(DECORA_COMPILER_CLASSES_DIR), \
 +    CLASSPATH := $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR), \
-+    DISABLED_WARNINGS := rawtypes unchecked deprecation removal, \
++    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
++    DISABLED_WARNINGS := rawtypes unchecked deprecation removal options, \
 +    DEPENDS := $(BUILD_JSLC_COMPILER) $(BUILD_GRAPHICS_CORE_TEMP), \
 +))
 +
@@ -547,7 +550,8 @@ index 00000000000..9056e163279
 +    SRC := $(PRISM_COMPILER_SRC_DIR), \
 +    BIN := $(PRISM_COMPILER_CLASSES_DIR), \
 +    CLASSPATH := $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR), \
-+    DISABLED_WARNINGS := rawtypes unchecked deprecation removal, \
++    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
++    DISABLED_WARNINGS := rawtypes unchecked deprecation removal options, \
 +    DEPENDS := $(BUILD_JSLC_COMPILER) $(BUILD_GRAPHICS_CORE_TEMP), \
 +))
 +
@@ -668,7 +672,6 @@ index 00000000000..9056e163279
 +ifeq ($(call isTargetOs, macosx ios), true)
 +  TARGETS += $(METALLIB_GENSRC_OUTPUT)
 +endif
-+
 diff --git a/make/modules/javafx.graphics/Java.gmk b/make/modules/javafx.graphics/Java.gmk
 new file mode 100644
 index 00000000000..c20a88ecb3e
@@ -931,7 +934,7 @@ index 00000000000..898c64819ef
 +TARGETS += $(BUILD_LIBJAVAFXIIO)
 diff --git a/make/modules/javafx.media/Java.gmk b/make/modules/javafx.media/Java.gmk
 new file mode 100644
-index 00000000000..4ee4ef7f9d2
+index 00000000000..401bc9cd179
 --- /dev/null
 +++ b/make/modules/javafx.media/Java.gmk
 @@ -0,0 +1,2 @@

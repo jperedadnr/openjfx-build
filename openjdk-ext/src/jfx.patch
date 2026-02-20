@@ -334,7 +334,7 @@ index 00000000000..82fcc6967bf
 +JAVAC_FLAGS += -encoding UTF-8
 diff --git a/make/modules/javafx.graphics/Gensrc.gmk b/make/modules/javafx.graphics/Gensrc.gmk
 new file mode 100644
-index 00000000000..3eea285217f
+index 00000000000..0f552aac119
 --- /dev/null
 +++ b/make/modules/javafx.graphics/Gensrc.gmk
 @@ -0,0 +1,334 @@
@@ -521,10 +521,10 @@ index 00000000000..3eea285217f
 +	$(TOUCH) $@
 +
 +################################################################################
-+# Step 6: Compile Decora Metal shaders (macOS/iOS only)
++# Step 6: Compile Decora Metal shaders (macOS only)
 +################################################################################
 +
-+ifeq ($(call isTargetOs, macosx ios), true)
++ifeq ($(call isTargetOs, macosx), true)
 +  DECORA_MSL_MARKER := $(MSL_DECORA_DIR)/_decora_msl.marker
 +
 +  $(DECORA_MSL_MARKER): $(SHADER_FLATTEN_MARKER)
@@ -590,10 +590,10 @@ index 00000000000..3eea285217f
 +	$(TOUCH) $@
 +
 +################################################################################
-+# Step 8: Compile Prism Metal shaders (macOS/iOS only)
++# Step 8: Compile Prism Metal shaders (macOS only)
 +################################################################################
 +
-+ifeq ($(call isTargetOs, macosx ios), true)
++ifeq ($(call isTargetOs, macosx), true)
 +  PRISM_MSL_MARKER := $(MSL_PRISM_DIR)/_prism_msl.marker
 +
 +  $(PRISM_MSL_MARKER): $(PRISM_FLATTEN_MARKER)
@@ -609,10 +609,10 @@ index 00000000000..3eea285217f
 +endif
 +
 +################################################################################
-+# Step 9: Compile and link native Metal shaders (macOS/iOS only)
++# Step 9: Compile and link native Metal shaders (macOS only)
 +################################################################################
 +
-+ifeq ($(call isTargetOs, macosx ios), true)
++ifeq ($(call isTargetOs, macosx), true)
 +  NATIVE_METAL_SRC_DIR := $(GRAPHICS_MODULE_SRC)/src/main/native-prism-mtl/msl
 +  NATIVE_MSL_MARKER := $(MSL_BUILD_DIR)/_native_msl.marker
 +
@@ -639,7 +639,7 @@ index 00000000000..3eea285217f
 +# Step 10: Copy metallib to final location
 +################################################################################
 +
-+ifeq ($(call isTargetOs, macosx ios), true)
++ifeq ($(call isTargetOs, macosx), true)
 +  # Copy metallib to the proper package location in gensrc output
 +  METALLIB_GENSRC_OUTPUT := $(JSL_DECORA_GENSRC_DIR)/com/sun/prism/mtl/msl/jfxshaders.metallib
 +
@@ -657,8 +657,8 @@ index 00000000000..3eea285217f
 +# This allows Lib.gmk to depend on headers being generated
 +MTL_HEADERS_READY_MARKER := $(MTL_HEADERS_DIR)/.headers_ready
 +
-+ifeq ($(call isTargetOs, macosx ios), true)
-+  # On macOS/iOS, headers marker depends on Decora MSL compilation (which creates DecoraShaderCommon.h)
++ifeq ($(call isTargetOs, macosx), true)
++  # On macOS, headers marker depends on Decora MSL compilation (which creates DecoraShaderCommon.h)
 +  $(MTL_HEADERS_READY_MARKER): $(SHADER_FLATTEN_MARKER) $(PRISM_FLATTEN_MARKER) $(DECORA_MSL_MARKER)
 +	$(TOUCH) $@
 +else
@@ -669,7 +669,7 @@ index 00000000000..3eea285217f
 +
 +TARGETS := $(SHADER_FLATTEN_MARKER) $(PRISM_FLATTEN_MARKER) $(MTL_HEADERS_READY_MARKER)
 +
-+ifeq ($(call isTargetOs, macosx ios), true)
++ifeq ($(call isTargetOs, macosx), true)
 +  TARGETS += $(METALLIB_GENSRC_OUTPUT)
 +endif
 diff --git a/make/modules/javafx.graphics/Java.gmk b/make/modules/javafx.graphics/Java.gmk

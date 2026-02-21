@@ -334,7 +334,7 @@ index 00000000000..82fcc6967bf
 +JAVAC_FLAGS += -encoding UTF-8
 diff --git a/make/modules/javafx.graphics/Gensrc.gmk b/make/modules/javafx.graphics/Gensrc.gmk
 new file mode 100644
-index 00000000000..2ab12095619
+index 00000000000..35816737ba7
 --- /dev/null
 +++ b/make/modules/javafx.graphics/Gensrc.gmk
 @@ -0,0 +1,376 @@
@@ -433,9 +433,9 @@ index 00000000000..2ab12095619
 +	$(call LogInfo, Generating JSL parser with ANTLR)
 +	$(call MakeTargetDir)
 +	$(JAVA) -cp $(call FixPath, $(ANTLR_JAR)) org.antlr.v4.Tool \
-+	    -o $(ANTLR_GENSRC_DIR) \
++	    -o $(call FixPath, $(ANTLR_GENSRC_DIR)) \
 +	    -package com.sun.scenario.effect.compiler \
-+	    -visitor $<
++	    -visitor $(call FixPath, $<)
 +	$(TOUCH) $@
 +
 +ANTLR_GENERATED_FILES := \
@@ -525,7 +525,7 @@ index 00000000000..2ab12095619
 +	    --add-exports=javafx.graphics/com.sun.scenario.effect.impl.state=ALL-UNNAMED \
 +	    -cp "$(DECORA_JAVA_CP)" \
 +	    -Dfile.encoding=UTF-8 \
-+	    GenAllDecoraShaders -i $(DECORA_COMPILER_SRC_DIR) -o $(JSL_DECORA_TEMP_DIR) \
++	    GenAllDecoraShaders -i $(call FixPath, $(DECORA_COMPILER_SRC_DIR)) -o $(call FixPath, $(JSL_DECORA_TEMP_DIR)) \
 +	    -t -pkg com/sun/scenario/effect $(DECORA_PIPELINE_OPTS) -all GenAllDecoraShaders
 +	$(TOUCH) $@
 +
@@ -623,7 +623,7 @@ index 00000000000..2ab12095619
 +	      --add-exports=javafx.graphics/com.sun.scenario.effect.impl.state=ALL-UNNAMED \
 +	      -cp "$(PRISM_JAVA_CP)" \
 +	      -Dfile.encoding=UTF-8 \
-+	      CompileJSL -i $(PRISM_COMPILER_SRC_DIR) -o $(JSL_PRISM_TEMP_DIR) \
++	      CompileJSL -i $(call FixPath, $(PRISM_COMPILER_SRC_DIR)) -o $(call FixPath, $(JSL_PRISM_TEMP_DIR)) \
 +	      -t -pkg com/sun/prism $(PRISM_PIPELINE_OPTS) -name $$FILE; \
 +	done
 +	$(TOUCH) $@

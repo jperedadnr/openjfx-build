@@ -334,7 +334,7 @@ index 00000000000..82fcc6967bf
 +JAVAC_FLAGS += -encoding UTF-8
 diff --git a/make/modules/javafx.graphics/Gensrc.gmk b/make/modules/javafx.graphics/Gensrc.gmk
 new file mode 100644
-index 00000000000..6b8c74c653b
+index 00000000000..c20a1a9b6ca
 --- /dev/null
 +++ b/make/modules/javafx.graphics/Gensrc.gmk
 @@ -0,0 +1,354 @@
@@ -477,7 +477,7 @@ index 00000000000..6b8c74c653b
 +    SMALL_JAVA := false, \
 +    SRC := $(DECORA_COMPILER_SRC_DIR), \
 +    BIN := $(DECORA_COMPILER_CLASSES_DIR), \
-+    CLASSPATH := $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR), \
++    CLASSPATH := $(call FixPath, $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR)), \
 +    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
 +    DISABLED_WARNINGS := rawtypes unchecked deprecation removal options, \
 +    DEPENDS := $(BUILD_JSLC_COMPILER) $(BUILD_GRAPHICS_CORE_TEMP), \
@@ -512,7 +512,7 @@ index 00000000000..6b8c74c653b
 +	    --add-exports=javafx.graphics/com.sun.scenario.effect=ALL-UNNAMED \
 +	    --add-exports=javafx.graphics/com.sun.scenario.effect.light=ALL-UNNAMED \
 +	    --add-exports=javafx.graphics/com.sun.scenario.effect.impl.state=ALL-UNNAMED \
-+	    -cp "$(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(DECORA_COMPILER_CLASSES_DIR)$(PATH_SEP)$(DECORA_COMPILER_SRC_DIR)" \
++	    -cp "$(call FixPath, $(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(DECORA_COMPILER_CLASSES_DIR)$(PATH_SEP)$(DECORA_COMPILER_SRC_DIR))" \
 +	    -Dfile.encoding=UTF-8 \
 +	    GenAllDecoraShaders -i $(DECORA_COMPILER_SRC_DIR) -o $(JSL_DECORA_TEMP_DIR) \
 +	    -t -pkg com/sun/scenario/effect $(DECORA_PIPELINE_OPTS) -all GenAllDecoraShaders
@@ -561,7 +561,7 @@ index 00000000000..6b8c74c653b
 +    SMALL_JAVA := false, \
 +    SRC := $(PRISM_COMPILER_SRC_DIR), \
 +    BIN := $(PRISM_COMPILER_CLASSES_DIR), \
-+    CLASSPATH := $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR), \
++    CLASSPATH := $(call FixPath, $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR)), \
 +    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
 +    DISABLED_WARNINGS := rawtypes unchecked deprecation removal options, \
 +    DEPENDS := $(BUILD_JSLC_COMPILER) $(BUILD_GRAPHICS_CORE_TEMP), \
@@ -599,7 +599,7 @@ index 00000000000..6b8c74c653b
 +	      --add-exports=javafx.graphics/com.sun.scenario.effect=ALL-UNNAMED \
 +	      --add-exports=javafx.graphics/com.sun.scenario.effect.light=ALL-UNNAMED \
 +	      --add-exports=javafx.graphics/com.sun.scenario.effect.impl.state=ALL-UNNAMED \
-+	      -cp "$(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(PRISM_COMPILER_CLASSES_DIR)$(PATH_SEP)$(PRISM_COMPILER_SRC_DIR)" \
++	      -cp "$(call FixPath, $(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(PRISM_COMPILER_CLASSES_DIR)$(PATH_SEP)$(PRISM_COMPILER_SRC_DIR))" \
 +	      -Dfile.encoding=UTF-8 \
 +	      CompileJSL -i $(PRISM_COMPILER_SRC_DIR) -o $(JSL_PRISM_TEMP_DIR) \
 +	      -t -pkg com/sun/prism $(PRISM_PIPELINE_OPTS) -name $$FILE; \

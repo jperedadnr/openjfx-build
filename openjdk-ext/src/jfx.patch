@@ -334,10 +334,10 @@ index 00000000000..82fcc6967bf
 +JAVAC_FLAGS += -encoding UTF-8
 diff --git a/make/modules/javafx.graphics/Gensrc.gmk b/make/modules/javafx.graphics/Gensrc.gmk
 new file mode 100644
-index 00000000000..35816737ba7
+index 00000000000..247ae77533f
 --- /dev/null
 +++ b/make/modules/javafx.graphics/Gensrc.gmk
-@@ -0,0 +1,376 @@
+@@ -0,0 +1,390 @@
 +include GensrcCommon.gmk
 +include Execute.gmk
 +
@@ -388,12 +388,19 @@ index 00000000000..35816737ba7
 +    DEPENDS := $(BASE_VERSION_INFO_GENSRC), \
 +))
 +
++# Prepare module path for BUILD_GRAPHICS_CORE_TEMP
++ifeq ($(call isTargetOs, windows), true)
++  GRAPHICS_TEMP_MODULE_PATH_ARG := --module-path $(call FixPath, $(BASE_CORE_TEMP_DIR))
++else
++  GRAPHICS_TEMP_MODULE_PATH_ARG := --module-path $(BASE_CORE_TEMP_DIR)
++endif
++
 +# Compile javafx.graphics core classes using module-source-path and module-path to javafx.base
 +$(eval $(call SetupJavaCompilation, BUILD_GRAPHICS_CORE_TEMP, \
 +    SMALL_JAVA := false, \
 +    SRC := $(GRAPHICS_MODULE_SRC)/src/main/java, \
 +    BIN := $(GRAPHICS_CORE_TEMP_DIR), \
-+    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION) --module-path $(BASE_CORE_TEMP_DIR) --add-modules=javafx.base, \
++    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION) $(GRAPHICS_TEMP_MODULE_PATH_ARG) --add-modules=javafx.base, \
 +    DISABLED_WARNINGS := rawtypes unchecked deprecation removal preview missing-explicit-ctor serial overloads module this-escape lossy-conversions auxiliaryclass dangling-doc-comments static restricted exports fallthrough options, \
 +    DEPENDS := $(BUILD_BASE_CORE_TEMP), \
 +))
@@ -454,12 +461,19 @@ index 00000000000..35816737ba7
 +
 +JSLC_SRC_DIR := $(GRAPHICS_MODULE_SRC)/src/jslc/java
 +
++# On Windows, we need to fix the ANTLR_JAR path for use in CLASSPATH
++ifeq ($(call isTargetOs, windows), true)
++  ANTLR_JAR_FIXED := $(call FixPath, $(ANTLR_JAR))
++else
++  ANTLR_JAR_FIXED := $(ANTLR_JAR)
++endif
++
 +$(eval $(call SetupJavaCompilation, BUILD_JSLC_COMPILER, \
 +    SMALL_JAVA := false, \
 +    SRC := $(JSLC_SRC_DIR), \
 +    EXTRA_FILES := $(ANTLR_GENERATED_FILES), \
 +    BIN := $(JSLC_CLASSES_DIR), \
-+    CLASSPATH := $(ANTLR_JAR), \
++    CLASSPATH := $(ANTLR_JAR_FIXED), \
 +    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
 +    DISABLED_WARNINGS := rawtypes unchecked deprecation removal this-escape options, \
 +))

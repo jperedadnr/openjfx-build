@@ -334,10 +334,10 @@ index 00000000000..82fcc6967bf
 +JAVAC_FLAGS += -encoding UTF-8
 diff --git a/make/modules/javafx.graphics/Gensrc.gmk b/make/modules/javafx.graphics/Gensrc.gmk
 new file mode 100644
-index 00000000000..54829601b29
+index 00000000000..3d2888eb5f1
 --- /dev/null
 +++ b/make/modules/javafx.graphics/Gensrc.gmk
-@@ -0,0 +1,365 @@
+@@ -0,0 +1,378 @@
 +include GensrcCommon.gmk
 +include Execute.gmk
 +
@@ -462,7 +462,6 @@ index 00000000000..54829601b29
 +    CLASSPATH := $(ANTLR_JAR), \
 +    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
 +    DISABLED_WARNINGS := rawtypes unchecked deprecation removal this-escape options, \
-+    STRIP_CLASSPATH_QUOTES := true, \
 +))
 +
 +$(JSLC_CLASSES_DIR)/_the.BUILD_JSLC_COMPILER_batch: $(ANTLR_GENERATED_FILES)
@@ -474,15 +473,22 @@ index 00000000000..54829601b29
 +
 +DECORA_COMPILER_SRC_DIR := $(GRAPHICS_MODULE_SRC)/src/main/jsl-decora
 +
++# On Windows, we need to convert the classpath to Windows format before SetupJavaCompilation
++DECORA_COMPILER_CP_RAW := $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR)
++ifeq ($(call isTargetOs, windows), true)
++  DECORA_COMPILER_CP := $(call FixPath, $(DECORA_COMPILER_CP_RAW))
++else
++  DECORA_COMPILER_CP := $(DECORA_COMPILER_CP_RAW)
++endif
++
 +$(eval $(call SetupJavaCompilation, BUILD_DECORA_COMPILERS, \
 +    SMALL_JAVA := false, \
 +    SRC := $(DECORA_COMPILER_SRC_DIR), \
 +    BIN := $(DECORA_COMPILER_CLASSES_DIR), \
-+    CLASSPATH := $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR), \
++    CLASSPATH := $(DECORA_COMPILER_CP), \
 +    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
 +    DISABLED_WARNINGS := rawtypes unchecked deprecation removal options, \
 +    DEPENDS := $(BUILD_JSLC_COMPILER) $(BUILD_GRAPHICS_CORE_TEMP), \
-+    STRIP_CLASSPATH_QUOTES := true, \
 +))
 +
 +$(DECORA_COMPILER_CLASSES_DIR)/_the.BUILD_DECORA_COMPILERS_batch: $(BUILD_JSLC_COMPILER)
@@ -563,15 +569,22 @@ index 00000000000..54829601b29
 +
 +PRISM_COMPILER_SRC_DIR := $(GRAPHICS_MODULE_SRC)/src/main/jsl-prism
 +
++# On Windows, we need to convert the classpath to Windows format before SetupJavaCompilation
++PRISM_COMPILER_CP_RAW := $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR)
++ifeq ($(call isTargetOs, windows), true)
++  PRISM_COMPILER_CP := $(call FixPath, $(PRISM_COMPILER_CP_RAW))
++else
++  PRISM_COMPILER_CP := $(PRISM_COMPILER_CP_RAW)
++endif
++
 +$(eval $(call SetupJavaCompilation, BUILD_PRISM_COMPILERS, \
 +    SMALL_JAVA := false, \
 +    SRC := $(PRISM_COMPILER_SRC_DIR), \
 +    BIN := $(PRISM_COMPILER_CLASSES_DIR), \
-+    CLASSPATH := $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR), \
++    CLASSPATH := $(PRISM_COMPILER_CP), \
 +    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
 +    DISABLED_WARNINGS := rawtypes unchecked deprecation removal options, \
 +    DEPENDS := $(BUILD_JSLC_COMPILER) $(BUILD_GRAPHICS_CORE_TEMP), \
-+    STRIP_CLASSPATH_QUOTES := true, \
 +))
 +
 +$(PRISM_COMPILER_CLASSES_DIR)/_the.BUILD_PRISM_COMPILERS_batch: $(BUILD_JSLC_COMPILER)

@@ -334,10 +334,10 @@ index 00000000000..82fcc6967bf
 +JAVAC_FLAGS += -encoding UTF-8
 diff --git a/make/modules/javafx.graphics/Gensrc.gmk b/make/modules/javafx.graphics/Gensrc.gmk
 new file mode 100644
-index 00000000000..822b48f7a7c
+index 00000000000..3e8d2f32e16
 --- /dev/null
 +++ b/make/modules/javafx.graphics/Gensrc.gmk
-@@ -0,0 +1,390 @@
+@@ -0,0 +1,362 @@
 +include GensrcCommon.gmk
 +include Execute.gmk
 +
@@ -388,19 +388,12 @@ index 00000000000..822b48f7a7c
 +    DEPENDS := $(BASE_VERSION_INFO_GENSRC), \
 +))
 +
-+# Prepare module path for BUILD_GRAPHICS_CORE_TEMP
-+ifeq ($(call isTargetOs, windows), true)
-+  GRAPHICS_TEMP_MODULE_PATH_ARG := --module-path $(call FixPath, $(BASE_CORE_TEMP_DIR))
-+else
-+  GRAPHICS_TEMP_MODULE_PATH_ARG := --module-path $(BASE_CORE_TEMP_DIR)
-+endif
-+
 +# Compile javafx.graphics core classes using module-source-path and module-path to javafx.base
 +$(eval $(call SetupJavaCompilation, BUILD_GRAPHICS_CORE_TEMP, \
 +    SMALL_JAVA := false, \
 +    SRC := $(GRAPHICS_MODULE_SRC)/src/main/java, \
 +    BIN := $(GRAPHICS_CORE_TEMP_DIR), \
-+    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION) $(GRAPHICS_TEMP_MODULE_PATH_ARG) --add-modules=javafx.base, \
++    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION) --module-path $(BASE_CORE_TEMP_DIR) --add-modules=javafx.base, \
 +    DISABLED_WARNINGS := rawtypes unchecked deprecation removal preview missing-explicit-ctor serial overloads module this-escape lossy-conversions auxiliaryclass dangling-doc-comments static restricted exports fallthrough options, \
 +    DEPENDS := $(BUILD_BASE_CORE_TEMP), \
 +))
@@ -439,10 +432,10 @@ index 00000000000..822b48f7a7c
 +$(ANTLR_OUTPUT_MARKER): $(JSL_GRAMMAR) $(ANTLR_JAR)
 +	$(call LogInfo, Generating JSL parser with ANTLR)
 +	$(call MakeTargetDir)
-+	$(JAVA) -cp $(call FixPath, $(ANTLR_JAR)) org.antlr.v4.Tool \
-+	    -o $(call FixPath, $(ANTLR_GENSRC_DIR)) \
++	$(JAVA) -cp $(ANTLR_JAR) org.antlr.v4.Tool \
++	    -o $(ANTLR_GENSRC_DIR) \
 +	    -package com.sun.scenario.effect.compiler \
-+	    -visitor $(call FixPath, $<)
++	    -visitor $<
 +	$(TOUCH) $@
 +
 +ANTLR_GENERATED_FILES := \
@@ -461,19 +454,12 @@ index 00000000000..822b48f7a7c
 +
 +JSLC_SRC_DIR := $(GRAPHICS_MODULE_SRC)/src/jslc/java
 +
-+# On Windows, we need to fix the ANTLR_JAR path for use in CLASSPATH
-+ifeq ($(call isTargetOs, windows), true)
-+  ANTLR_JAR_FIXED := $(call FixPath, $(ANTLR_JAR))
-+else
-+  ANTLR_JAR_FIXED := $(ANTLR_JAR)
-+endif
-+
 +$(eval $(call SetupJavaCompilation, BUILD_JSLC_COMPILER, \
 +    SMALL_JAVA := false, \
 +    SRC := $(JSLC_SRC_DIR), \
 +    EXTRA_FILES := $(ANTLR_GENERATED_FILES), \
 +    BIN := $(JSLC_CLASSES_DIR), \
-+    CLASSPATH := $(ANTLR_JAR_FIXED), \
++    CLASSPATH := $(ANTLR_JAR), \
 +    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
 +    DISABLED_WARNINGS := rawtypes unchecked deprecation removal this-escape options, \
 +))
@@ -491,7 +477,7 @@ index 00000000000..822b48f7a7c
 +    SMALL_JAVA := false, \
 +    SRC := $(DECORA_COMPILER_SRC_DIR), \
 +    BIN := $(DECORA_COMPILER_CLASSES_DIR), \
-+    CLASSPATH := $(call FixPath, $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR)), \
++    CLASSPATH := $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR), \
 +    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
 +    DISABLED_WARNINGS := rawtypes unchecked deprecation removal options, \
 +    DEPENDS := $(BUILD_JSLC_COMPILER) $(BUILD_GRAPHICS_CORE_TEMP), \
@@ -516,15 +502,8 @@ index 00000000000..822b48f7a7c
 +endif
 +
 +# Build classpath for Decora shader generation
-+DECORA_JAVA_CP_RAW := $(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(DECORA_COMPILER_CLASSES_DIR)$(PATH_SEP)$(DECORA_COMPILER_SRC_DIR)
-+DECORA_MODULE_PATH_RAW := $(BASE_CORE_TEMP_DIR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)
-+ifeq ($(call isTargetOs, windows), true)
-+  DECORA_JAVA_CP := $(call FixPath, $(DECORA_JAVA_CP_RAW))
-+  DECORA_MODULE_PATH := $(call FixPath, $(DECORA_MODULE_PATH_RAW))
-+else
-+  DECORA_JAVA_CP := $(DECORA_JAVA_CP_RAW)
-+  DECORA_MODULE_PATH := $(DECORA_MODULE_PATH_RAW)
-+endif
++DECORA_JAVA_CP := $(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(DECORA_COMPILER_CLASSES_DIR)$(PATH_SEP)$(DECORA_COMPILER_SRC_DIR)
++DECORA_MODULE_PATH := $(BASE_CORE_TEMP_DIR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)
 +
 +$(DECORA_SHADER_MARKER): $(BUILD_DECORA_COMPILERS)
 +	$(call LogInfo, Generating Decora shaders)
@@ -539,7 +518,7 @@ index 00000000000..822b48f7a7c
 +	    --add-exports=javafx.graphics/com.sun.scenario.effect.impl.state=ALL-UNNAMED \
 +	    -cp $(DECORA_JAVA_CP) \
 +	    -Dfile.encoding=UTF-8 \
-+	    GenAllDecoraShaders -i $(call FixPath, $(DECORA_COMPILER_SRC_DIR)) -o $(call FixPath, $(JSL_DECORA_TEMP_DIR)) \
++	    GenAllDecoraShaders -i $(DECORA_COMPILER_SRC_DIR) -o $(JSL_DECORA_TEMP_DIR) \
 +	    -t -pkg com/sun/scenario/effect $(DECORA_PIPELINE_OPTS) -all GenAllDecoraShaders
 +	$(TOUCH) $@
 +
@@ -586,7 +565,7 @@ index 00000000000..822b48f7a7c
 +    SMALL_JAVA := false, \
 +    SRC := $(PRISM_COMPILER_SRC_DIR), \
 +    BIN := $(PRISM_COMPILER_CLASSES_DIR), \
-+    CLASSPATH := $(call FixPath, $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR)), \
++    CLASSPATH := $(JSLC_CLASSES_DIR)$(PATH_SEP)$(ANTLR_JAR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)$(PATH_SEP)$(BASE_CORE_TEMP_DIR), \
 +    JAVAC_FLAGS := -source $(OLDEST_BOOT_JDK_VERSION) -target $(OLDEST_BOOT_JDK_VERSION), \
 +    DISABLED_WARNINGS := rawtypes unchecked deprecation removal options, \
 +    DEPENDS := $(BUILD_JSLC_COMPILER) $(BUILD_GRAPHICS_CORE_TEMP), \
@@ -612,15 +591,8 @@ index 00000000000..822b48f7a7c
 +endif
 +
 +# Build classpath for Prism shader generation
-+PRISM_JAVA_CP_RAW := $(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(PRISM_COMPILER_CLASSES_DIR)$(PATH_SEP)$(PRISM_COMPILER_SRC_DIR)
-+PRISM_MODULE_PATH_RAW := $(BASE_CORE_TEMP_DIR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)
-+ifeq ($(call isTargetOs, windows), true)
-+  PRISM_JAVA_CP := $(call FixPath, $(PRISM_JAVA_CP_RAW))
-+  PRISM_MODULE_PATH := $(call FixPath, $(PRISM_MODULE_PATH_RAW))
-+else
-+  PRISM_JAVA_CP := $(PRISM_JAVA_CP_RAW)
-+  PRISM_MODULE_PATH := $(PRISM_MODULE_PATH_RAW)
-+endif
++PRISM_JAVA_CP := $(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(PRISM_COMPILER_CLASSES_DIR)$(PATH_SEP)$(PRISM_COMPILER_SRC_DIR)
++PRISM_MODULE_PATH := $(BASE_CORE_TEMP_DIR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)
 +
 +# Use single target with for loop to serialize execution (prevents PrismShaderCommon.h corruption)
 +$(PRISM_SHADER_MARKER): $(BUILD_PRISM_COMPILERS)
@@ -637,7 +609,7 @@ index 00000000000..822b48f7a7c
 +	      --add-exports=javafx.graphics/com.sun.scenario.effect.impl.state=ALL-UNNAMED \
 +	      -cp $(PRISM_JAVA_CP) \
 +	      -Dfile.encoding=UTF-8 \
-+	      CompileJSL -i $(call FixPath, $(PRISM_COMPILER_SRC_DIR)) -o $(call FixPath, $(JSL_PRISM_TEMP_DIR)) \
++	      CompileJSL -i $(PRISM_COMPILER_SRC_DIR) -o $(JSL_PRISM_TEMP_DIR) \
 +	      -t -pkg com/sun/prism $(PRISM_PIPELINE_OPTS) -name $$FILE; \
 +	done
 +	$(TOUCH) $@

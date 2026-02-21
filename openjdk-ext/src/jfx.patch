@@ -334,10 +334,10 @@ index 00000000000..82fcc6967bf
 +JAVAC_FLAGS += -encoding UTF-8
 diff --git a/make/modules/javafx.graphics/Gensrc.gmk b/make/modules/javafx.graphics/Gensrc.gmk
 new file mode 100644
-index 00000000000..897c108bea2
+index 00000000000..2ab12095619
 --- /dev/null
 +++ b/make/modules/javafx.graphics/Gensrc.gmk
-@@ -0,0 +1,370 @@
+@@ -0,0 +1,376 @@
 +include GensrcCommon.gmk
 +include Execute.gmk
 +
@@ -503,10 +503,13 @@ index 00000000000..897c108bea2
 +
 +# Build classpath for Decora shader generation
 +DECORA_JAVA_CP_RAW := $(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(DECORA_COMPILER_CLASSES_DIR)$(PATH_SEP)$(DECORA_COMPILER_SRC_DIR)
++DECORA_MODULE_PATH_RAW := $(BASE_CORE_TEMP_DIR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)
 +ifeq ($(call isTargetOs, windows), true)
 +  DECORA_JAVA_CP := $(call FixPath, $(DECORA_JAVA_CP_RAW))
++  DECORA_MODULE_PATH := $(call FixPath, $(DECORA_MODULE_PATH_RAW))
 +else
 +  DECORA_JAVA_CP := $(DECORA_JAVA_CP_RAW)
++  DECORA_MODULE_PATH := $(DECORA_MODULE_PATH_RAW)
 +endif
 +
 +$(DECORA_SHADER_MARKER): $(BUILD_DECORA_COMPILERS)
@@ -515,7 +518,7 @@ index 00000000000..897c108bea2
 +ifeq ($(call isTargetOs, macosx), true)
 +	$(call MakeDir, $(MTL_HEADERS_DIR))
 +endif
-+	$(JAVA) --module-path "$(BASE_CORE_TEMP_DIR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)" \
++	$(JAVA) --module-path "$(DECORA_MODULE_PATH)" \
 +	    --add-modules=javafx.base,javafx.graphics \
 +	    --add-exports=javafx.graphics/com.sun.scenario.effect=ALL-UNNAMED \
 +	    --add-exports=javafx.graphics/com.sun.scenario.effect.light=ALL-UNNAMED \
@@ -596,10 +599,13 @@ index 00000000000..897c108bea2
 +
 +# Build classpath for Prism shader generation
 +PRISM_JAVA_CP_RAW := $(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(PRISM_COMPILER_CLASSES_DIR)$(PATH_SEP)$(PRISM_COMPILER_SRC_DIR)
++PRISM_MODULE_PATH_RAW := $(BASE_CORE_TEMP_DIR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)
 +ifeq ($(call isTargetOs, windows), true)
 +  PRISM_JAVA_CP := $(call FixPath, $(PRISM_JAVA_CP_RAW))
++  PRISM_MODULE_PATH := $(call FixPath, $(PRISM_MODULE_PATH_RAW))
 +else
 +  PRISM_JAVA_CP := $(PRISM_JAVA_CP_RAW)
++  PRISM_MODULE_PATH := $(PRISM_MODULE_PATH_RAW)
 +endif
 +
 +# Use single target with for loop to serialize execution (prevents PrismShaderCommon.h corruption)
@@ -610,7 +616,7 @@ index 00000000000..897c108bea2
 +	$(call MakeDir, $(MTL_HEADERS_DIR))
 +endif
 +	@for FILE in $(PRISM_JSL_FILES); do \
-+	  $(JAVA) --module-path "$(BASE_CORE_TEMP_DIR)$(PATH_SEP)$(GRAPHICS_CORE_TEMP_DIR)" \
++	  $(JAVA) --module-path "$(PRISM_MODULE_PATH)" \
 +	      --add-modules=javafx.base,javafx.graphics \
 +	      --add-exports=javafx.graphics/com.sun.scenario.effect=ALL-UNNAMED \
 +	      --add-exports=javafx.graphics/com.sun.scenario.effect.light=ALL-UNNAMED \

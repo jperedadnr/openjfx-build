@@ -334,10 +334,10 @@ index 00000000000..82fcc6967bf
 +JAVAC_FLAGS += -encoding UTF-8
 diff --git a/make/modules/javafx.graphics/Gensrc.gmk b/make/modules/javafx.graphics/Gensrc.gmk
 new file mode 100644
-index 00000000000..c20a1a9b6ca
+index 00000000000..897c108bea2
 --- /dev/null
 +++ b/make/modules/javafx.graphics/Gensrc.gmk
-@@ -0,0 +1,354 @@
+@@ -0,0 +1,370 @@
 +include GensrcCommon.gmk
 +include Execute.gmk
 +
@@ -432,7 +432,7 @@ index 00000000000..c20a1a9b6ca
 +$(ANTLR_OUTPUT_MARKER): $(JSL_GRAMMAR) $(ANTLR_JAR)
 +	$(call LogInfo, Generating JSL parser with ANTLR)
 +	$(call MakeTargetDir)
-+	$(JAVA) -cp $(ANTLR_JAR) org.antlr.v4.Tool \
++	$(JAVA) -cp $(call FixPath, $(ANTLR_JAR)) org.antlr.v4.Tool \
 +	    -o $(ANTLR_GENSRC_DIR) \
 +	    -package com.sun.scenario.effect.compiler \
 +	    -visitor $<
@@ -501,6 +501,14 @@ index 00000000000..c20a1a9b6ca
 +  DECORA_PIPELINE_OPTS := -es2
 +endif
 +
++# Build classpath for Decora shader generation
++DECORA_JAVA_CP_RAW := $(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(DECORA_COMPILER_CLASSES_DIR)$(PATH_SEP)$(DECORA_COMPILER_SRC_DIR)
++ifeq ($(call isTargetOs, windows), true)
++  DECORA_JAVA_CP := $(call FixPath, $(DECORA_JAVA_CP_RAW))
++else
++  DECORA_JAVA_CP := $(DECORA_JAVA_CP_RAW)
++endif
++
 +$(DECORA_SHADER_MARKER): $(BUILD_DECORA_COMPILERS)
 +	$(call LogInfo, Generating Decora shaders)
 +	$(call MakeDir, $(JSL_DECORA_TEMP_DIR))
@@ -512,7 +520,7 @@ index 00000000000..c20a1a9b6ca
 +	    --add-exports=javafx.graphics/com.sun.scenario.effect=ALL-UNNAMED \
 +	    --add-exports=javafx.graphics/com.sun.scenario.effect.light=ALL-UNNAMED \
 +	    --add-exports=javafx.graphics/com.sun.scenario.effect.impl.state=ALL-UNNAMED \
-+	    -cp "$(call FixPath, $(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(DECORA_COMPILER_CLASSES_DIR)$(PATH_SEP)$(DECORA_COMPILER_SRC_DIR))" \
++	    -cp "$(DECORA_JAVA_CP)" \
 +	    -Dfile.encoding=UTF-8 \
 +	    GenAllDecoraShaders -i $(DECORA_COMPILER_SRC_DIR) -o $(JSL_DECORA_TEMP_DIR) \
 +	    -t -pkg com/sun/scenario/effect $(DECORA_PIPELINE_OPTS) -all GenAllDecoraShaders
@@ -586,6 +594,14 @@ index 00000000000..c20a1a9b6ca
 +  PRISM_PIPELINE_OPTS := -es2
 +endif
 +
++# Build classpath for Prism shader generation
++PRISM_JAVA_CP_RAW := $(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(PRISM_COMPILER_CLASSES_DIR)$(PATH_SEP)$(PRISM_COMPILER_SRC_DIR)
++ifeq ($(call isTargetOs, windows), true)
++  PRISM_JAVA_CP := $(call FixPath, $(PRISM_JAVA_CP_RAW))
++else
++  PRISM_JAVA_CP := $(PRISM_JAVA_CP_RAW)
++endif
++
 +# Use single target with for loop to serialize execution (prevents PrismShaderCommon.h corruption)
 +$(PRISM_SHADER_MARKER): $(BUILD_PRISM_COMPILERS)
 +	$(call LogInfo, Generating Prism shaders)
@@ -599,7 +615,7 @@ index 00000000000..c20a1a9b6ca
 +	      --add-exports=javafx.graphics/com.sun.scenario.effect=ALL-UNNAMED \
 +	      --add-exports=javafx.graphics/com.sun.scenario.effect.light=ALL-UNNAMED \
 +	      --add-exports=javafx.graphics/com.sun.scenario.effect.impl.state=ALL-UNNAMED \
-+	      -cp "$(call FixPath, $(ANTLR_JAR)$(PATH_SEP)$(JSLC_CLASSES_DIR)$(PATH_SEP)$(GRAPHICS_MODULE_SRC)/src/jslc/resources$(PATH_SEP)$(PRISM_COMPILER_CLASSES_DIR)$(PATH_SEP)$(PRISM_COMPILER_SRC_DIR))" \
++	      -cp "$(PRISM_JAVA_CP)" \
 +	      -Dfile.encoding=UTF-8 \
 +	      CompileJSL -i $(PRISM_COMPILER_SRC_DIR) -o $(JSL_PRISM_TEMP_DIR) \
 +	      -t -pkg com/sun/prism $(PRISM_PIPELINE_OPTS) -name $$FILE; \

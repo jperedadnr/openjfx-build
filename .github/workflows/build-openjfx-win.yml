@@ -28,7 +28,6 @@ jobs:
           cd mobile
           patch -p1 < $GITHUB_WORKSPACE/openjdk-ext/src/jfx.patch
           cp -r $GITHUB_WORKSPACE/openjdk-ext/src/make/data/javafx-tools make/data
-          chmod +x make/data/javafx-tools/*.jar
       - name: Clone OpenJFX and build OpenJDK Mobile with OpenJFX
         shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
         run: |
@@ -36,7 +35,7 @@ jobs:
           cd mobile
           sh configure --with-conf-name=jfx --with-openjfx-modules=../jfx --disable-warnings-as-errors
           cd build/jfx
-          make images
+          make LOG=cmdlines,info images
           cd images
           zip -r $GITHUB_WORKSPACE/openjdk-jfx-windows-x86_64.zip jdk
 

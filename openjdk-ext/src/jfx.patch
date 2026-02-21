@@ -334,7 +334,7 @@ index 00000000000..82fcc6967bf
 +JAVAC_FLAGS += -encoding UTF-8
 diff --git a/make/modules/javafx.graphics/Gensrc.gmk b/make/modules/javafx.graphics/Gensrc.gmk
 new file mode 100644
-index 00000000000..0580a3fc5e4
+index 00000000000..822b48f7a7c
 --- /dev/null
 +++ b/make/modules/javafx.graphics/Gensrc.gmk
 @@ -0,0 +1,390 @@
@@ -350,7 +350,7 @@ index 00000000000..0580a3fc5e4
 +
 +# Configure path separator for cross-platform support
 +ifeq ($(call isTargetOs, windows), true)
-+  PATH_SEP := :
++  PATH_SEP := ;
 +else
 +  PATH_SEP := :
 +endif

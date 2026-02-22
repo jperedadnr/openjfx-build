@@ -794,7 +794,7 @@ index 00000000000..c20a88ecb3e
 +TARGETS += $(call CreateHkTargets, $(CLEAN_FILES))
 diff --git a/make/modules/javafx.graphics/Lib.gmk b/make/modules/javafx.graphics/Lib.gmk
 new file mode 100644
-index 00000000000..7fe0e89ee6a
+index 00000000000..7cc651d28f3
 --- /dev/null
 +++ b/make/modules/javafx.graphics/Lib.gmk
 @@ -0,0 +1,218 @@
@@ -916,7 +916,7 @@ index 00000000000..7fe0e89ee6a
 +    LIBS_linux := -lX11, \
 +    LIBS_macosx := -framework AppKit -framework ApplicationServices -framework Metal -framework Carbon -framework OpenGL -framework QuartzCore -framework Security -framework Network, \
 +    LIBS_ios := -framework AppKit -framework ApplicationServices -framework Metal -framework Carbon -framework OpenGL -framework QuartzCore -framework Security -framework Network, \
-+    LIBS_windows := -manifest -dynamicbase -nxcompat delayimp.lib gdi32.lib urlmon.lib Comdlg32.lib winmm.lib imm32.lib shell32.lib Uiautomationcore.lib dwmapi.lib version.lib /DELAYLOAD:user32.dll /DELAYLOAD:urlmon.dll /DELAYLOAD:winmm.dll /DELAYLOAD:shell32.dll /DELAYLOAD:shlwapi.dll /DELAYLOAD:Uiautomationcore.dll /DELAYLOAD:dwmapi.dll /DELAYLOAD:version.dll, \
++    LIBS_windows := -manifest -dynamicbase -nxcompat delayimp.lib gdi32.lib urlmon.lib Comdlg32.lib winmm.lib imm32.lib shell32.lib Uiautomationcore.lib dwmapi.lib shlwapi.lib version.lib /DELAYLOAD:user32.dll /DELAYLOAD:urlmon.dll /DELAYLOAD:winmm.dll /DELAYLOAD:shell32.dll /DELAYLOAD:Uiautomationcore.dll /DELAYLOAD:dwmapi.dll /DELAYLOAD:version.dll, \
 +    EXTRA_FILES := $(EXTRA_GLASS_SRC), \
 +    CFLAGS_macosx := -DMACOS_MIN_VERSION_MAJOR=11 -DMACOS_MIN_VERSION_MINOR=0, \
 +    CFLAGS_windows := -EHsc -D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR -DINLINE=__inline -DUNICODE -D_UNICODE -permissive -std:c++14, \

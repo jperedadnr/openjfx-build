@@ -355,10 +355,10 @@ index 00000000000..82fcc6967bf
 +JAVAC_FLAGS += -encoding UTF-8
 diff --git a/make/modules/javafx.graphics/Gensrc.gmk b/make/modules/javafx.graphics/Gensrc.gmk
 new file mode 100644
-index 00000000000..b7ac9f2c330
+index 00000000000..f04fb6439fe
 --- /dev/null
 +++ b/make/modules/javafx.graphics/Gensrc.gmk
-@@ -0,0 +1,404 @@
+@@ -0,0 +1,420 @@
 +include GensrcCommon.gmk
 +include Execute.gmk
 +
@@ -549,7 +549,19 @@ index 00000000000..b7ac9f2c330
 +# We DON'T delete the jsl-* dirs so incremental builds work - Java.gmk excludes them.
 +SHADER_FLATTEN_MARKER := $(SUPPORT_OUTPUTDIR)/javafx-build/javafx.graphics/.shaders_flattened
 +
++# Pre-declare HLSL markers so they are defined when referenced in flatten prerequisites below
++HLSL_DECORA_MARKER :=
++HLSL_PRISM_MARKER :=
++ifeq ($(call isTargetOs, windows), true)
++  HLSL_DECORA_MARKER := $(SUPPORT_OUTPUTDIR)/javafx-build/javafx.graphics/.decora_hlsl.marker
++  HLSL_PRISM_MARKER  := $(SUPPORT_OUTPUTDIR)/javafx-build/javafx.graphics/.prism_hlsl.marker
++endif
++
++ifeq ($(call isTargetOs, windows), true)
++$(SHADER_FLATTEN_MARKER): $(DECORA_SHADER_MARKER) $(HLSL_DECORA_MARKER)
++else
 +$(SHADER_FLATTEN_MARKER): $(DECORA_SHADER_MARKER)
++endif
 +	$(call LogInfo, Copying Decora shaders to gensrc output)
 +	$(CP) -R $(JSL_DECORA_TEMP_DIR)/com $(JSL_DECORA_GENSRC_DIR)/
 +	$(TOUCH) $@
@@ -578,18 +590,18 @@ index 00000000000..b7ac9f2c330
 +################################################################################
 +
 +ifeq ($(call isTargetOs, windows), true)
-+  HLSL_DECORA_SRC_DIR := $(JSL_DECORA_TEMP_DIR)/com/sun/scenario/effect/impl/hw/d3d/hlsl
-+  HLSL_DECORA_OUT_DIR := $(JSL_DECORA_GENSRC_DIR)/com/sun/scenario/effect/impl/hw/d3d/hlsl
-+  HLSL_DECORA_SOURCES := $(wildcard $(HLSL_DECORA_SRC_DIR)/*.hlsl)
-+  HLSL_DECORA_OBJECTS := $(patsubst $(HLSL_DECORA_SRC_DIR)/%.hlsl, $(HLSL_DECORA_OUT_DIR)/%.obj, $(HLSL_DECORA_SOURCES))
-+  HLSL_DECORA_MARKER := $(SUPPORT_OUTPUTDIR)/javafx-build/javafx.graphics/.decora_hlsl.marker
++  HLSL_DECORA_DIR_OUT := $(JSL_DECORA_TEMP_DIR)/com/sun/scenario/effect/impl/hw/d3d/hlsl
 +
-+  $(HLSL_DECORA_OUT_DIR)/%.obj: $(HLSL_DECORA_SRC_DIR)/%.hlsl $(SHADER_FLATTEN_MARKER)
-+	$(call LogInfo, Compiling d3d decora shader: $<)
-+	$(call MakeDir, $(@D))
-+	$(FXC) /nologo /T ps_3_0 /Fo $@ $<
-+
-+  $(HLSL_DECORA_MARKER): $(HLSL_DECORA_OBJECTS)
++  # Use a recipe-level loop (same as Metal shaders) to avoid parse-time wildcard issues
++  $(HLSL_DECORA_MARKER): $(DECORA_SHADER_MARKER)
++	$(call LogInfo, Compiling Decora HLSL shaders)
++	$(call MakeDir, $(HLSL_DECORA_DIR_OUT))
++	for FILE in $(HLSL_DECORA_DIR_OUT)/*.hlsl; do \
++	  if [ -f "$$FILE" ]; then \
++	    BASE=$$(basename "$$FILE" .hlsl); \
++	    $(FXC) /nologo /T ps_3_0 /Fo "$(HLSL_DECORA_DIR_OUT)/$$BASE.obj" "$$FILE"; \
++	  fi; \
++	done
 +	$(TOUCH) $@
 +endif
 +
@@ -654,7 +666,11 @@ index 00000000000..b7ac9f2c330
 +
 +PRISM_FLATTEN_MARKER := $(SUPPORT_OUTPUTDIR)/javafx-build/javafx.graphics/.prism_flattened
 +
++ifeq ($(call isTargetOs, windows), true)
++$(PRISM_FLATTEN_MARKER): $(PRISM_SHADER_MARKER) $(HLSL_PRISM_MARKER)
++else
 +$(PRISM_FLATTEN_MARKER): $(PRISM_SHADER_MARKER)
++endif
 +	$(call LogInfo, Copying Prism shaders to gensrc output)
 +	$(CP) -R $(JSL_PRISM_TEMP_DIR)/com $(JSL_PRISM_GENSRC_DIR)/
 +	$(TOUCH) $@
@@ -683,18 +699,18 @@ index 00000000000..b7ac9f2c330
 +################################################################################
 +
 +ifeq ($(call isTargetOs, windows), true)
-+  HLSL_PRISM_SRC_DIR := $(JSL_PRISM_TEMP_DIR)/com/sun/prism/d3d/hlsl
-+  HLSL_PRISM_OUT_DIR := $(JSL_PRISM_GENSRC_DIR)/com/sun/prism/d3d/hlsl
-+  HLSL_PRISM_SOURCES := $(wildcard $(HLSL_PRISM_SRC_DIR)/*.hlsl)
-+  HLSL_PRISM_OBJECTS := $(patsubst $(HLSL_PRISM_SRC_DIR)/%.hlsl, $(HLSL_PRISM_OUT_DIR)/%.obj, $(HLSL_PRISM_SOURCES))
-+  HLSL_PRISM_MARKER := $(SUPPORT_OUTPUTDIR)/javafx-build/javafx.graphics/.prism_hlsl.marker
++  HLSL_PRISM_DIR_OUT := $(JSL_PRISM_TEMP_DIR)/com/sun/prism/d3d/hlsl
 +
-+  $(HLSL_PRISM_OUT_DIR)/%.obj: $(HLSL_PRISM_SRC_DIR)/%.hlsl $(PRISM_FLATTEN_MARKER)
-+	$(call LogInfo, Compiling d3d prism shader: $<)
-+	$(call MakeDir, $(@D))
-+	$(FXC) /nologo /T ps_3_0 /Fo $@ $<
-+
-+  $(HLSL_PRISM_MARKER): $(HLSL_PRISM_OBJECTS)
++  # Use a recipe-level loop (same as Metal shaders) to avoid parse-time wildcard issues
++  $(HLSL_PRISM_MARKER): $(PRISM_SHADER_MARKER)
++	$(call LogInfo, Compiling Prism HLSL shaders)
++	$(call MakeDir, $(HLSL_PRISM_DIR_OUT))
++	for FILE in $(HLSL_PRISM_DIR_OUT)/*.hlsl; do \
++	  if [ -f "$$FILE" ]; then \
++	    BASE=$$(basename "$$FILE" .hlsl); \
++	    $(FXC) /nologo /T ps_3_0 /Fo "$(HLSL_PRISM_DIR_OUT)/$$BASE.obj" "$$FILE"; \
++	  fi; \
++	done
 +	$(TOUCH) $@
 +endif
 +

@@ -35,7 +35,7 @@ jobs:
           cd mobile
           sh configure --with-conf-name=jfx --with-openjfx-modules=../jfx --disable-warnings-as-errors
           cd build/jfx
-          make LOG=cmdlines,info images
+          make images
           cd images
           zip -r $GITHUB_WORKSPACE/openjdk-jfx-windows-x86_64.zip jdk
 
